@@ -1,5 +1,5 @@
 (cl:defpackage #:twentyfour-system
-  (:use :cl :asdf))
+  (:use :cl :asdf :uiop))
 
 (cl:in-package #:twentyfour-system)
 
