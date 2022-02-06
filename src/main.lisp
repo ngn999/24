@@ -31,7 +31,7 @@
 ;; 5 5 5 1: 5 * (5 - 1 / 5)
 ;; 用逆波兰表达式,输出结果.
 (defun cal (target l)
-  (if (= (length l) 1)
+  (if (null (cdr l))
       (if (= (car l) target)
           l
           nil)
