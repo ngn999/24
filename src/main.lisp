@@ -2,10 +2,27 @@
   (:use :cl))
 (cl:in-package :twentyfour)
 
-;; 5, 5, 5, 1
 (defun main()
   ""
-  (format t "hello world!"))
+  (opts:define-opts
+    (:name :help
+     :description "show this help message."
+     :short #\h
+     :long "help"))
+  (multiple-value-bind (options free-args)
+      (opts:get-opts)
+    (if (getf options :help)
+        (progn
+          (opts:describe
+           :prefix "twentyfour Usage: ./twentyfour 5 5 5 1")
+          (uiop:quit)))
+    (if (= 4 (length free-args))
+        (format t "~{~a~%~}" (loop for r in (all-permutations (mapcar #'(lambda (x) (parse-integer x)) free-args))
+                           for rpn = (cal 24 r)
+                           when (not (null rpn))
+                             collect rpn))
+        (progn (opts:describe :prefix "twentyfour Usage: ./twentyfour 5 5 5 1")
+               (uiop:quit)))))
 
 ;; TODO: 使用递归的思想, 降到3个数的问题, 再降到2个数的问题
 ;; TODO: 利用lisp宏的特性,生成所有的组合,求值后找出所有的可能
@@ -14,12 +31,7 @@
 ;; 5 5 5 1: 5 * (5 - 1 / 5)
 ;; 用逆波兰表达式,输出结果.
 (defun cal (target l)
-  ;; (format t "~{~a~}~%" l)
   (if (= (length l) 1)
-      ;; (if (= (car l) target)
-      ;;     (format t "~{ ~a ~}~%" (if p
-      ;;                                (cons (car l) result)
-      ;;                                (append result (list (car l))))))
       (if (= (car l) target)
           l
           nil)
@@ -39,27 +51,15 @@
               (bediv `(,first ,@bediv  /)))
         )))
 
+(defun eliminate-duplicates (l)
+  (cond ((null l) l)
+        ((member (car l) (cdr l))
+         (eliminate-duplicates (cdr l)))
+        (t (cons (car l) (eliminate-duplicates (cdr l))))))
+
 (defun all-permutations (list)
-  (cond ((null list) nil)
+    (cond ((null list) nil)
         ((null (cdr list)) (list list))
-        (t (loop for element in list
+        (t (loop for element in (eliminate-duplicates list)
              append (mapcar #'(lambda (l) (cons element l))
                             (all-permutations (remove element list :count 1)))))))
-(all-permutations '(5 5 5 1))
-
-(mapcar #'(lambda (l)
-            (let ((r (cal 24 l)))
-              (if r (format t "~{ ~a ~}~%" r))))
-        (all-permutations '(4 1 6 5)))
-
-(mapcar #'(lambda (l)
-            (let ((r (cal 24 l)))
-              (if r (format t "~{ ~a ~}~%" r))))
-        (all-permutations '(1 5 5 5)))
-
-;; (format t "~{ ~a ~} ~%" (cal 24 '(26 1 1)))
-;; (format t "~{ ~a ~} ~%" (cal 24 '(1 2 27)))
-;; (format t "~{ ~a ~} ~%" (cal 24 '(48 2 1)))
-;; (format t "~{ ~a ~} ~%" (cal 24 '(1 2 27)))
-;; (format t "~{ ~a ~} ~%" (cal 24 '(5 5 1 5)))
-;; (format t "~{ ~a ~} ~%" (cal 24 '(5 6 4 1)))

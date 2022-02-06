@@ -7,7 +7,7 @@
   :version "0.1.0"
   :author ""
   :license ""
-  :depends-on ()
+  :depends-on ("unix-opts")
   :components ((:module "src"
                 :components
                 ((:file "main"))))
