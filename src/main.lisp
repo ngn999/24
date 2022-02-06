@@ -48,7 +48,8 @@
               (besub `(,first ,@besub  -))
               (mult `(,first ,@mult  *))
               (div `(,@div  ,first  /))
-              (bediv `(,first ,@bediv  /)))
+              (bediv `(,first ,@bediv  /))
+              )
         )))
 
 (defun eliminate-duplicates (l)
